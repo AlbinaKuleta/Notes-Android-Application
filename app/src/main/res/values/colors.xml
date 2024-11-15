@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Primary Colors -->
+    <color name="primary_blue">#1E88E5</color>
+    <color name="primary_purple">#8E24AA</color>
+    <color name="primary_green">#43A047</color>
+    <color name="primary_orange">#FB8C00</color>
+
+    <!-- Pastel Colors -->
+    <color name="pastel_pink">#F8BBD0</color>
+    <color name="pastel_blue">#BBDEFB</color>
+    <color name="pastel_green">#C8E6C9</color>
+    <color name="pastel_yellow">#FFF9C4</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_pink">#FF4081</color>
+    <color name="accent_teal">#1DE9B6</color>
+    <color name="accent_indigo">#536DFE</color>
+    <color name="accent_yellow">#FFEB3B</color>
+
+    <!-- Neutral Colors -->
+    <color name="gray_light">#E0E0E0</color>
+    <color name="gray_medium">#9E9E9E</color>
+    <color name="gray_dark">#616161</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#FF5F6D</color>
+    <color name="gradient_end">#FFC371</color>
+
+    <!-- Background Colors -->
+    <color name="background_light">#F5F5F5</color>
+    <color name="background_dark">#212121</color>
+    <color name="background_blue">#E3F2FD</color>
+
+    <!-- Additional Colors -->
+    <color name="sunset_orange">#FF6E40</color>
+    <color name="mint_green">#4CAF50</color>
+    <color name="sky_blue">#29B6F6</color>
+    <color name="lavender">#B39DDB</color>
+    <color name="rose_red">#E57373</color>
+    <color name="deep_purple">#673AB7</color>
+    <color name="sea_green">#00ACC1</color>
+    <color name="forest_green">#2E7D32</color>
+</resources>
