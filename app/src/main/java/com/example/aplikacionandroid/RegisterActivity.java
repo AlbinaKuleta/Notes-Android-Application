@@ -194,12 +194,12 @@ public class RegisterActivity extends AppCompatActivity {
                                                 Toast.LENGTH_LONG).show();
                                         //user profile shows after successful registration
 
-                      /* Intent intent = new Intent(RegisterActivity.this, UserProfileActivity.class);
+                       Intent intent = new Intent(RegisterActivity.this, UserProfileActivity.class);
                       // To Prevent User from returning back to Register Activity on pressing back button after registration
                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
                        | Intent.FLAG_ACTIVITY_NEW_TASK);
                        startActivity(intent);
-                       finish(); //to close Register Activity */
+                       finish(); //to close Register Activity
                                     }else{
                                         Toast.makeText(RegisterActivity.this, "User registered failed, please try again",
                                                 Toast.LENGTH_LONG).show();
