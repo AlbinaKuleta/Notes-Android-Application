@@ -24,8 +24,8 @@
 <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_below="@id/imageView_profile_dp"
     android:id="@+id/textView_show_welcome"
+    android:layout_below="@id/imageView_profile_dp"
     android:hint="Loading..."
     android:layout_centerHorizontal="true"
     android:layout_marginTop="5dp"
@@ -160,23 +160,17 @@
         android:layout_marginTop="20dp"
         android:layout_below="@id/divider_gender"
         android:textSize="18sp"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="20dp"
-        android:layout_below="@id/textView_show_mobile"
-        android:background="@android:color/darker_gray"
-        android:id="@+id/divider_mobile"/>
 
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="?android:attr/progressBarStyleLarge"
         android:id="@+id/progressBar"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:elevation="10dp"
-        android:visibility="gone"/>
-    </RelativeLayout>
+        android:visibility="gone" />
+</RelativeLayout>
 
 </LinearLayout>
 </ScrollView>

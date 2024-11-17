@@ -46,6 +46,15 @@ private static final String TAG = "LoginActivity";
 
         authProfile = FirebaseAuth.getInstance();
 
+        //Reset Password
+        Button buttonForgotPassword = findViewById(R.id.button_forgot_password);
+        buttonForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+           Toast.makeText(LoginActivity.this, "You can reset your password now!", Toast.LENGTH_SHORT).show();
+           startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
+            }
+        });
         //show hide password using Eye icon
         ImageView imageViewShowHidePwd = findViewById(R.id.imageView_show_hide_pwd);
         imageViewShowHidePwd.setImageResource(R.drawable.ic_hide_pwd);

@@ -81,15 +81,23 @@
            android:layout_marginRight="70dp"
            android:layout_marginLeft="70dp"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Forgot password?"
+            android:id="@+id/button_forgot_password"
+            android:layout_below="@id/button_login"
+            android:layout_marginRight="70dp"
+            android:layout_marginLeft="70dp"/>
         <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleLarge"
+            android:id="@+id/progressBar"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:elevation="10dp"
-            android:visibility="gone" />
-
+            android:visibility="gone"/>
 
     </RelativeLayout>
 </ScrollView>
