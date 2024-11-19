@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,11 +24,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class DeleteProfileActivity extends AppCompatActivity {
 private FirebaseAuth authProfile;
@@ -37,6 +42,7 @@ private TextView textViewAuthenticated;
 private ProgressBar progressBar;
 private String userPwd;
 private Button buttonReAuthenticate, buttonDeleteUser;
+private static final String TAG = "DeleteProfileActivity";
 
 
     @Override
@@ -173,6 +179,7 @@ private Button buttonReAuthenticate, buttonDeleteUser;
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
+                    deleteUserData();
                     authProfile.signOut();
                     Toast.makeText(DeleteProfileActivity.this, "User has been deleted!",
                             Toast.LENGTH_SHORT).show();
@@ -187,6 +194,23 @@ private Button buttonReAuthenticate, buttonDeleteUser;
                     }
                 }
                 progressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+   //delete all the data of user
+    private void deleteUserData() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Registered User");
+        databaseReference.child(firebaseUser.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "OnSuccesss: User Data Deleted");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, e.getMessage());
+                Toast.makeText(DeleteProfileActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
