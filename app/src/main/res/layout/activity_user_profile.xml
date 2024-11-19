@@ -169,7 +169,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:elevation="10dp"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 </RelativeLayout>
 
 </LinearLayout>

@@ -48,7 +48,6 @@ private FirebaseAuth authProfile;
         textViewGender = findViewById(R.id.textView_show_gender);
         textViewMobile = findViewById(R.id.textView_show_mobile);
         progressBar = findViewById(R.id.progressBar);
-
         authProfile = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = authProfile.getCurrentUser();
 
@@ -142,21 +141,20 @@ progressBar.setVisibility(View.GONE);
             startActivity(getIntent());
             finish();
             overridePendingTransition(0,0);
-        }/*else if(id == R.id.menu_update_profile){
+        }else if(id == R.id.menu_update_profile){
             Intent intent = new Intent(UserProfileActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
+            finish();
         }else if(id == R.id.menu_update_email){
             Intent intent = new Intent(UserProfileActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
+            finish();
         }else if (id == R.id.menu_settings){
             Toast.makeText(UserProfileActivity.this, "menu_settings",Toast.LENGTH_SHORT).show();
-        }else if(id == R.id.menu_change_password){
-            Intent intent = new Intent(UserProfileActivity.this, ChangePasswordActivity.class);
-            startActivity(intent);
         }else if(id == R.id.menu_delete_profile){
             Intent intent = new Intent(UserProfileActivity.this, DeleteProfileActivity.class);
             startActivity(intent);
-        }*/else if(id == R.id.menu_logout){
+        }else if(id == R.id.menu_logout){
             authProfile.signOut();
             Toast.makeText(UserProfileActivity.this, "Logged Out", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(UserProfileActivity.this, MainActivity.class);
