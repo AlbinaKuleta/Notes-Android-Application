@@ -30,13 +30,13 @@ android {
 }
 
 dependencies {
-    // Keep appcompat and core libraries at compatible versions for SDK 33
-    implementation 'androidx.appcompat:appcompat:1.6.1'  // Use a version compatible with SDK 33
-    implementation 'com.google.android.material:material:1.6.0' // Version compatible with SDK 33
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'  // Version compatible with SDK 33
-    implementation 'androidx.core:core-ktx:1.9.0'  // Version compatible with SDK 33
-    implementation 'androidx.core:core:1.9.0'  // Version compatible with SDK 33
-    implementation 'androidx.annotation:annotation-experimental:1.3.0'  // Version compatible with SDK 33
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core:1.9.0'
+    implementation 'androidx.annotation:annotation-experimental:1.3.0'
     implementation 'com.google.firebase:firebase-auth:23.1.0'
     implementation 'com.google.firebase:firebase-database:21.0.0'
     implementation 'androidx.activity:activity:1.8.0'

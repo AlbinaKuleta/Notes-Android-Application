@@ -10,6 +10,9 @@
         android:id="@+id/menu_refresh"
         app:showAsAction="ifRoom"/>
 
+    <item android:title="My Notes"
+        android:id="@+id/menu_notes"/>
+
     <item android:title="Update Profile"
         android:id="@+id/menu_update_profile"/>
 

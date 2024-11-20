@@ -246,6 +246,10 @@ authProfile = FirebaseAuth.getInstance();
             startActivity(getIntent());
             finish();
             overridePendingTransition(0,0);
+        }else if(id == R.id.menu_notes){
+            Intent intent = new Intent(UpdateProfileActivity.this, NotesActivity.class);
+            startActivity(intent);
+            finish();
         }else if(id == R.id.menu_update_profile){
             Intent intent = new Intent(UpdateProfileActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
