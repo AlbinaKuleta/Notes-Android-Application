@@ -37,7 +37,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class NotesActivity extends AppCompatActivity {
@@ -156,6 +159,8 @@ public class NotesActivity extends AppCompatActivity {
     private void showNotification(String noteTitle) {
         String channelId = "note_creation_channel";
 
+        String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
+
         // Check if the POST_NOTIFICATIONS permission is granted
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -168,7 +173,7 @@ public class NotesActivity extends AppCompatActivity {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_notification) // Ensure `ic_note` exists in your `drawable` folder
                 .setContentTitle("Note Created")
-                .setContentText("A new note titled '" + noteTitle + "' has been created.")
+                .setContentText("Title: " + noteTitle + "\nCreated at: " + timestamp)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
 

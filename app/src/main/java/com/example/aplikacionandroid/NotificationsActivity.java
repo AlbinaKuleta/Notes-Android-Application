@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.aplikacionandroid.utils.NotificationUtils;
 
@@ -38,5 +40,14 @@ public class NotificationsActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setAdapter(adapter);
         }
+        Button clearNotifications = findViewById(R.id.clear_notifications);
+        clearNotifications.setOnClickListener(v -> {
+            NotificationUtils.clearNotifications(this); // Thirr funksionin për të fshirë
+            Toast.makeText(this, "Notifications cleared", Toast.LENGTH_SHORT).show();
+            noNotifications.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        });
+
     }
+
 }

@@ -17,6 +17,12 @@
             android:gravity="center"
             android:layout_margin="16dp"
             android:visibility="gone"/>
+    <Button
+        android:id="@+id/clear_notifications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear Notifications"
+        android:layout_margin="16dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_notifications"

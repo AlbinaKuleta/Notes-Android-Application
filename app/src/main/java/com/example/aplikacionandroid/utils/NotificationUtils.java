@@ -3,8 +3,13 @@ package com.example.aplikacionandroid.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.aplikacionandroid.NotificationsActivity;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class NotificationUtils {
@@ -15,7 +20,8 @@ public class NotificationUtils {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         Set<String> notifications = prefs.getStringSet(NOTIFICATIONS_KEY, new HashSet<>());
 
-        notifications.add(notification);
+        String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
+        notifications.add(notification + "\nTime: " + timestamp);
         prefs.edit().putStringSet(NOTIFICATIONS_KEY, notifications).apply();
     }
 
@@ -25,4 +31,10 @@ public class NotificationUtils {
 
         return new ArrayList<>(notifications);
     }
+
+    public static void clearNotifications(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().remove(NOTIFICATIONS_KEY).apply(); // Hiq të gjitha notifikimet
+    }
+
 }
