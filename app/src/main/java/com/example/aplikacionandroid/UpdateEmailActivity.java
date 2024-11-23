@@ -182,7 +182,11 @@ public class UpdateEmailActivity extends AppCompatActivity {
             startActivity(getIntent());
             finish();
             overridePendingTransition(0,0);
-        }else if(id == R.id.menu_notes){
+        }else if (id == R.id.menu_notifications) {
+            Intent intent = new Intent(UpdateEmailActivity.this, NotificationsActivity.class);
+            startActivity(intent);
+        }
+        else if(id == R.id.menu_notes){
             Intent intent = new Intent(UpdateEmailActivity.this, NotesActivity.class);
             startActivity(intent);
             finish();

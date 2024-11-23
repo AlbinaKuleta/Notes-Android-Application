@@ -3,11 +3,18 @@ package com.example.aplikacionandroid;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +23,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.aplikacionandroid.utils.NotificationUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
@@ -33,10 +41,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class NotesActivity extends AppCompatActivity {
-
+    private static final int POST_NOTIFICATION_PERMISSION_REQUEST_CODE = 1;
     private FirebaseAuth authProfile;
     private FirebaseDatabase database;
     private String userId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +56,6 @@ public class NotesActivity extends AppCompatActivity {
         authProfile = FirebaseAuth.getInstance();
         FirebaseUser currentUser = authProfile.getCurrentUser();
 
-        // Kontrollo nëse përdoruesi është autentifikuar
         if (currentUser == null) {
             Toast.makeText(this, "Please log in first!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MainActivity.class));
@@ -55,9 +63,11 @@ public class NotesActivity extends AppCompatActivity {
             return;
         }
 
-        // Merr ID-në unike të përdoruesit
+
         userId = currentUser.getUid();
         database = FirebaseDatabase.getInstance();
+
+        createNotificationChannel();
 
         FloatingActionButton add = findViewById(R.id.addNote);
         TextView empty = findViewById(R.id.empty);
@@ -65,7 +75,6 @@ public class NotesActivity extends AppCompatActivity {
 
         add.setOnClickListener(view -> openAddNoteDialog());
 
-        // Lexo shënimet e përdoruesit
         database.getReference("Registered User").child(userId).child("notes")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -119,6 +128,9 @@ public class NotesActivity extends AppCompatActivity {
                     } else {
                         storeNoteInDatabase(new Note(title, content));
                         dialogInterface.dismiss();
+
+                        requestNotificationPermissionAndShow(title);
+
                     }
                 })
                 .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
@@ -126,6 +138,59 @@ public class NotesActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    private void requestNotificationPermissionAndShow(String noteTitle) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Request the permission if not already granted
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, POST_NOTIFICATION_PERMISSION_REQUEST_CODE);
+            } else {
+                // If already granted, show the notification
+                showNotification(noteTitle);
+            }
+        } else {
+            // For older versions, show the notification directly
+            showNotification(noteTitle);
+        }
+    }
+
+    private void showNotification(String noteTitle) {
+        String channelId = "note_creation_channel";
+
+        // Check if the POST_NOTIFICATIONS permission is granted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted; do nothing
+            Toast.makeText(this, "Notification permission not granted!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Build and display the notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_notification) // Ensure `ic_note` exists in your `drawable` folder
+                .setContentTitle("Note Created")
+                .setContentText("A new note titled '" + noteTitle + "' has been created.")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1, builder.build());
+    }
+
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = "note_creation_channel";
+            String channelName = "Note Creation Notifications";
+            String channelDescription = "Notifications for note creation events";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
     private void openEditNoteDialog(Note note) {
         View view = LayoutInflater.from(this).inflate(R.layout.add_note_dialog, null);
         TextInputLayout titleLayout = view.findViewById(R.id.titleLayout);
@@ -169,11 +234,35 @@ public class NotesActivity extends AppCompatActivity {
                 .addOnSuccessListener(unused -> {
                     dialog.dismiss();
                     Toast.makeText(this, "Note added successfully!", Toast.LENGTH_SHORT).show();
+
+                    // Save the notification
+                    NotificationUtils.saveNotification(this, "Note created: " + note.getTitle());
+
+                    // Refresh badge
+                    invalidateOptionsMenu();
                 })
                 .addOnFailureListener(e -> {
                     dialog.dismiss();
                     Toast.makeText(this, "Failed to add note!", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+    }
+
+    private void updateBadge(TextView badge) {
+        ArrayList<String> notifications = NotificationUtils.getNotifications(this); // Fetch stored notifications
+        int count = notifications.size();
+
+        if (count > 0) {
+            badge.setText(String.valueOf(count));
+            badge.setVisibility(View.VISIBLE);
+        } else {
+            badge.setVisibility(View.GONE);
+        }
     }
 
     private void updateNoteInDatabase(String key, Note note) {
@@ -214,19 +303,37 @@ public class NotesActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.common_menu, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.menu_notifications);
+        View actionView = menuItem.getActionView();
+
+        if (actionView == null) {
+            actionView = getLayoutInflater().inflate(R.layout.badge_icon, null);
+            menuItem.setActionView(actionView);
+        }
+
+        TextView badge = actionView.findViewById(R.id.notification_badge);
+        updateBadge(badge); // Update the badge with the latest count
+
+        actionView.setOnClickListener(v -> onOptionsItemSelected(menuItem)); // Handle clicks
+
         return super.onCreateOptionsMenu(menu);
     }
+
     //When any menu item is selected
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-
         if(id == R.id.menu_refresh){
             //refresh activity
             startActivity(getIntent());
             finish();
             overridePendingTransition(0,0);
-        }else if(id == R.id.menu_notes){
+        }else if (id == R.id.menu_notifications) {
+            Intent intent = new Intent(NotesActivity.this, NotificationsActivity.class);
+            startActivity(intent);
+        }
+        else if(id == R.id.menu_notes){
             Intent intent = new Intent(NotesActivity.this, NotesActivity.class);
             startActivity(intent);
             finish();
