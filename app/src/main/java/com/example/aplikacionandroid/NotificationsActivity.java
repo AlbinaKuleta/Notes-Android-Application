@@ -42,12 +42,12 @@ public class NotificationsActivity extends AppCompatActivity {
         }
         Button clearNotifications = findViewById(R.id.clear_notifications);
         clearNotifications.setOnClickListener(v -> {
-            NotificationUtils.clearNotifications(this); // Thirr funksionin për të fshirë
+            NotificationUtils.clearNotifications(this);
             Toast.makeText(this, "Notifications cleared", Toast.LENGTH_SHORT).show();
             noNotifications.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         });
-
+        NotificationUtils.clearBadge(this);
     }
 
 }

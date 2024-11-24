@@ -34,7 +34,11 @@ public class NotificationUtils {
 
     public static void clearNotifications(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        prefs.edit().remove(NOTIFICATIONS_KEY).apply(); // Hiq të gjitha notifikimet
+        prefs.edit().remove(NOTIFICATIONS_KEY).apply();
+    }
+    public static void clearBadge(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putInt("unread_count", 0).apply();
     }
 
 }

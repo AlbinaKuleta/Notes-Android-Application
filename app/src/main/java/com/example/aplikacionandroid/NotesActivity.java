@@ -11,8 +11,10 @@ import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,6 +56,8 @@ public class NotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
+
+        getSupportActionBar().setTitle("One Note Application");
 
         FirebaseApp.initializeApp(this);
         authProfile = FirebaseAuth.getInstance();
@@ -132,7 +136,6 @@ public class NotesActivity extends AppCompatActivity {
                         storeNoteInDatabase(new Note(title, content));
                         dialogInterface.dismiss();
 
-                        requestNotificationPermissionAndShow(title);
 
                     }
                 })
@@ -147,11 +150,9 @@ public class NotesActivity extends AppCompatActivity {
                 // Request the permission if not already granted
                 requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, POST_NOTIFICATION_PERMISSION_REQUEST_CODE);
             } else {
-                // If already granted, show the notification
                 showNotification(noteTitle);
             }
         } else {
-            // For older versions, show the notification directly
             showNotification(noteTitle);
         }
     }
@@ -171,7 +172,7 @@ public class NotesActivity extends AppCompatActivity {
 
         // Build and display the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_notification) // Ensure `ic_note` exists in your `drawable` folder
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Note Created")
                 .setContentText("Title: " + noteTitle + "\nCreated at: " + timestamp)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -242,6 +243,7 @@ public class NotesActivity extends AppCompatActivity {
 
                     // Save the notification
                     NotificationUtils.saveNotification(this, "Note created: " + note.getTitle());
+                    incrementBadgeCount();
 
                     // Refresh badge
                     invalidateOptionsMenu();
@@ -251,7 +253,11 @@ public class NotesActivity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to add note!", Toast.LENGTH_SHORT).show();
                 });
     }
-
+    private void incrementBadgeCount() {
+        SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
+        int unreadCount = prefs.getInt("unread_count", 0);
+        prefs.edit().putInt("unread_count", unreadCount + 1).apply(); // Increment unread count
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -259,16 +265,17 @@ public class NotesActivity extends AppCompatActivity {
     }
 
     private void updateBadge(TextView badge) {
-        ArrayList<String> notifications = NotificationUtils.getNotifications(this); // Fetch stored notifications
-        int count = notifications.size();
+        SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
+        int unreadCount = prefs.getInt("unread_count", 0); // Retrieve unread count
 
-        if (count > 0) {
-            badge.setText(String.valueOf(count));
+        if (unreadCount > 0) {
+            badge.setText(String.valueOf(unreadCount));
             badge.setVisibility(View.VISIBLE);
         } else {
             badge.setVisibility(View.GONE);
         }
     }
+
 
     private void updateNoteInDatabase(String key, Note note) {
         ProgressDialog dialog = new ProgressDialog(this);
@@ -318,11 +325,24 @@ public class NotesActivity extends AppCompatActivity {
         }
 
         TextView badge = actionView.findViewById(R.id.notification_badge);
-        updateBadge(badge); // Update the badge with the latest count
+        updateBadge(badge); // Update the badge with the current unread count
 
-        actionView.setOnClickListener(v -> onOptionsItemSelected(menuItem)); // Handle clicks
+        actionView.setOnClickListener(v -> {
+            // Open the NotificationsActivity
+            startActivity(new Intent(NotesActivity.this, NotificationsActivity.class));
+
+            // Clear the badge count after clicking
+            clearBadgeCount();
+            badge.setVisibility(View.GONE); // Hide the badge from the UI
+        });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void clearBadgeCount() {
+        // Ruaj numrin e lexuar në SharedPreferences si 0
+        SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
+        prefs.edit().putInt("unread_count", 0).apply();
     }
 
     //When any menu item is selected
