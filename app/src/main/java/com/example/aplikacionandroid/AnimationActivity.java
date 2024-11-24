@@ -12,6 +12,8 @@ public class AnimationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_animation);
 
+        getSupportActionBar().setTitle("One Note Application");
+
         new Handler().postDelayed(() -> {
             Intent intent = new Intent(AnimationActivity.this, MainActivity.class);
             startActivity(intent);

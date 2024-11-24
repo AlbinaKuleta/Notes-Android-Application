@@ -1,24 +1,19 @@
 package com.example.aplikacionandroid;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +26,6 @@ public class UserProfileActivity extends AppCompatActivity {
 private TextView textViewWelcome, textViewFullName, textViewEmail, textViewDoB, textViewGender, textViewMobile;
 private ProgressBar progressBar;
 private String fullName, email, doB, gender, mobile;
-private ImageView imageView;
 private FirebaseAuth authProfile;
 
     @Override
@@ -39,7 +33,7 @@ private FirebaseAuth authProfile;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
-        getSupportActionBar().setTitle("Home");
+        getSupportActionBar().setTitle("My profile");
 
         textViewWelcome = findViewById(R.id.textView_show_welcome);
         textViewFullName = findViewById(R.id.textView_show_full_name);
@@ -106,7 +100,7 @@ if(readUserDetails != null){
     gender = readUserDetails.gender;
     mobile = readUserDetails.mobile;
 
-    textViewWelcome.setText("Welcome," + fullName + "!");
+    textViewWelcome.setText("Welcome, " + fullName + "!");
     textViewFullName.setText(fullName);
     textViewEmail.setText(email);
     textViewDoB.setText(doB);
@@ -124,12 +118,48 @@ progressBar.setVisibility(View.GONE);
             }
         });
     }
+    private void updateBadge(TextView badge) {
+        SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
+        int unreadCount = prefs.getInt("unread_count", 0); // Retrieve unread count
 
+        if (unreadCount > 0) {
+            badge.setText(String.valueOf(unreadCount));
+            badge.setVisibility(View.VISIBLE);
+        } else {
+            badge.setVisibility(View.GONE);
+        }
+    }
     //Creating ActionBar Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.common_menu, menu);
+        getMenuInflater().inflate(R.menu.second_menu, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.menu_notifications);
+        View actionView = menuItem.getActionView();
+
+        if (actionView == null) {
+            actionView = getLayoutInflater().inflate(R.layout.badge_icon, null);
+            menuItem.setActionView(actionView);
+        }
+
+        TextView badge = actionView.findViewById(R.id.notification_badge);
+        updateBadge(badge); // Update the badge with the current unread count
+
+        actionView.setOnClickListener(v -> {
+            // Open the NotificationsActivity
+            startActivity(new Intent(UserProfileActivity.this, NotificationsActivity.class));
+
+            // Clear the badge count after clicking
+            clearBadgeCount();
+            badge.setVisibility(View.GONE); // Hide the badge from the UI
+        });
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void clearBadgeCount() {
+        SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
+        prefs.edit().putInt("unread_count", 0).apply();
     }
      //When any menu item is selected
     @Override
@@ -144,11 +174,6 @@ progressBar.setVisibility(View.GONE);
         }else if (id == R.id.menu_notifications) {
             Intent intent = new Intent(UserProfileActivity.this, NotificationsActivity.class);
             startActivity(intent);
-        }
-        else if(id == R.id.menu_notes){
-            Intent intent = new Intent(UserProfileActivity.this, NotesActivity.class);
-            startActivity(intent);
-            finish();
         }else if(id == R.id.menu_update_profile){
             Intent intent = new Intent(UserProfileActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
@@ -157,8 +182,6 @@ progressBar.setVisibility(View.GONE);
             Intent intent = new Intent(UserProfileActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if (id == R.id.menu_settings){
-            Toast.makeText(UserProfileActivity.this, "menu_settings",Toast.LENGTH_SHORT).show();
         }else if(id == R.id.menu_delete_profile){
             Intent intent = new Intent(UserProfileActivity.this, DeleteProfileActivity.class);
             startActivity(intent);

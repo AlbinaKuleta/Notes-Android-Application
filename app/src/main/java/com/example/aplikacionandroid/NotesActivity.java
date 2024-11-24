@@ -358,8 +358,8 @@ public class NotesActivity extends AppCompatActivity {
             Intent intent = new Intent(NotesActivity.this, NotificationsActivity.class);
             startActivity(intent);
         }
-        else if(id == R.id.menu_notes){
-            Intent intent = new Intent(NotesActivity.this, NotesActivity.class);
+        else if(id == R.id.menu_profile){
+            Intent intent = new Intent(NotesActivity.this, UserProfileActivity.class);
             startActivity(intent);
             finish();
         }else if(id == R.id.menu_update_profile){
@@ -370,8 +370,6 @@ public class NotesActivity extends AppCompatActivity {
             Intent intent = new Intent(NotesActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if (id == R.id.menu_settings){
-            Toast.makeText(NotesActivity.this, "menu_settings",Toast.LENGTH_SHORT).show();
         }else if(id == R.id.menu_delete_profile){
             Intent intent = new Intent(NotesActivity.this, DeleteProfileActivity.class);
             startActivity(intent);

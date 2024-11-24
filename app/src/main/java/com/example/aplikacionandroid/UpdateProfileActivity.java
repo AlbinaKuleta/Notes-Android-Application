@@ -233,7 +233,7 @@ authProfile = FirebaseAuth.getInstance();
     //Creating ActionBar Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.common_menu, menu);
+        getMenuInflater().inflate(R.menu.second_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
     //When any menu item is selected
@@ -249,24 +249,17 @@ authProfile = FirebaseAuth.getInstance();
         }else if (id == R.id.menu_notifications) {
             Intent intent = new Intent(UpdateProfileActivity.this, NotificationsActivity.class);
             startActivity(intent);
-        }
-        else if(id == R.id.menu_notes){
-            Intent intent = new Intent(UpdateProfileActivity.this, NotesActivity.class);
-            startActivity(intent);
-            finish();
         }else if(id == R.id.menu_update_profile){
             Intent intent = new Intent(UpdateProfileActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
+            finish();
         }else if(id == R.id.menu_update_email){
             Intent intent = new Intent(UpdateProfileActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if (id == R.id.menu_settings){
-            Toast.makeText(UpdateProfileActivity.this, "menu_settings",Toast.LENGTH_SHORT).show();
         }else if(id == R.id.menu_delete_profile){
             Intent intent = new Intent(UpdateProfileActivity.this, DeleteProfileActivity.class);
             startActivity(intent);
-            finish();
         }else if(id == R.id.menu_logout){
             authProfile.signOut();
             Toast.makeText(UpdateProfileActivity.this, "Logged Out", Toast.LENGTH_LONG).show();

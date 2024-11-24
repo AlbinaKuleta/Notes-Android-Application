@@ -217,7 +217,7 @@ private static final String TAG = "DeleteProfileActivity";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.common_menu, menu);
+        getMenuInflater().inflate(R.menu.second_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
     //When any menu item is selected
@@ -246,8 +246,6 @@ private static final String TAG = "DeleteProfileActivity";
             Intent intent = new Intent(DeleteProfileActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if (id == R.id.menu_settings){
-            Toast.makeText(DeleteProfileActivity.this, "menu_settings",Toast.LENGTH_SHORT).show();
         }else if(id == R.id.menu_delete_profile){
             Intent intent = new Intent(DeleteProfileActivity.this, DeleteProfileActivity.class);
             startActivity(intent);

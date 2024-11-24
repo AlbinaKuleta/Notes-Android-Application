@@ -170,7 +170,7 @@ private static final String TAG = "LoginActivity";
         if(authProfile.getCurrentUser()!= null){
             Toast.makeText(LoginActivity.this, "Already logged in!",Toast.LENGTH_SHORT).show();
             //start the userProfileActivity
-            startActivity(new Intent(LoginActivity.this, UserProfileActivity.class));
+            startActivity(new Intent(LoginActivity.this, NotesActivity.class));
             finish(); //close LoginActivity
         }else{
             Toast.makeText(LoginActivity.this, "You can login now!",Toast.LENGTH_SHORT).show();

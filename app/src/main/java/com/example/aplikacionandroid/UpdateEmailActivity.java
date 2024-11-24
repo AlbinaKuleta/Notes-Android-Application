@@ -62,7 +62,7 @@ public class UpdateEmailActivity extends AppCompatActivity {
         TextView textViewOldEmail = findViewById(R.id.textView_update_email_old);
         textViewOldEmail.setText(userOldEmail);
 
-        if(firebaseUser.equals("")){
+        if (firebaseUser == null){
             Toast.makeText(UpdateEmailActivity.this, "Something went wrong!User's details not available.", Toast.LENGTH_LONG).show();
         }else{
             reAuthenticate(firebaseUser);
@@ -169,7 +169,7 @@ public class UpdateEmailActivity extends AppCompatActivity {
     //Creating ActionBar Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.common_menu, menu);
+        getMenuInflater().inflate(R.menu.second_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
     //When any menu item is selected
@@ -198,8 +198,6 @@ public class UpdateEmailActivity extends AppCompatActivity {
             Intent intent = new Intent(UpdateEmailActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if (id == R.id.menu_settings){
-            Toast.makeText(UpdateEmailActivity.this, "menu_settings",Toast.LENGTH_SHORT).show();
         }else if(id == R.id.menu_delete_profile){
             Intent intent = new Intent(UpdateEmailActivity.this, DeleteProfileActivity.class);
             startActivity(intent);
