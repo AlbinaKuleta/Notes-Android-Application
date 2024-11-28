@@ -25,29 +25,32 @@ public class NotificationsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_notifications);
         noNotifications = findViewById(R.id.no_notifications);
 
-        // Get the notifications from SharedPreferences
-        ArrayList<String> notifications = NotificationUtils.getNotifications(this);
+        fetchNotifications();
 
-        if (notifications.isEmpty()) {
-            noNotifications.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            noNotifications.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-
-            // Set up the RecyclerView
-            NotificationsAdapter adapter = new NotificationsAdapter(notifications);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setAdapter(adapter);
-        }
         Button clearNotifications = findViewById(R.id.clear_notifications);
         clearNotifications.setOnClickListener(v -> {
             NotificationUtils.clearNotifications(this);
-            Toast.makeText(this, "Notifications cleared", Toast.LENGTH_SHORT).show();
             noNotifications.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         });
+
         NotificationUtils.clearBadge(this);
+    }
+
+    private void fetchNotifications() {
+        NotificationUtils.getNotifications(this, notifications -> {
+            if (notifications.isEmpty()) {
+                noNotifications.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                noNotifications.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+
+                NotificationsAdapter adapter = new NotificationsAdapter(notifications);
+                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                recyclerView.setAdapter(adapter);
+            }
+        });
     }
 
 }

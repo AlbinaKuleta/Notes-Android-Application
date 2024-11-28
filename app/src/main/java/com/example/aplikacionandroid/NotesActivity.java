@@ -242,7 +242,7 @@ public class NotesActivity extends AppCompatActivity {
                     Toast.makeText(this, "Note added successfully!", Toast.LENGTH_SHORT).show();
 
                     // Save the notification
-                    NotificationUtils.saveNotification(this, "Note created: " + note.getTitle());
+                    NotificationUtils.saveNotification(this, "Note created", note.getTitle());
                     incrementBadgeCount();
 
                     // Refresh badge
@@ -282,17 +282,22 @@ public class NotesActivity extends AppCompatActivity {
         dialog.setMessage("Updating note...");
         dialog.show();
 
-        database.getReference("Registered User").child(userId).child("notes").child(key)
+        database.getReference("Registered User").child(userId).child("notes")
+                .child(key)
                 .setValue(note)
                 .addOnSuccessListener(unused -> {
                     dialog.dismiss();
                     Toast.makeText(this, "Note updated successfully!", Toast.LENGTH_SHORT).show();
+
+                    // Save notification for note update
+                    NotificationUtils.saveNotification(this, "Note updated", note.getTitle());
                 })
                 .addOnFailureListener(e -> {
                     dialog.dismiss();
                     Toast.makeText(this, "Failed to update note!", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     private void deleteNoteFromDatabase(String key) {
         ProgressDialog dialog = new ProgressDialog(this);

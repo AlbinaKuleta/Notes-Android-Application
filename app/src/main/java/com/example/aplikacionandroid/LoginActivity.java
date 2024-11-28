@@ -111,8 +111,8 @@ private static final String TAG = "LoginActivity";
                     if(firebaseUser.isEmailVerified()){
                         Toast.makeText(LoginActivity.this, "You are logged in now", Toast.LENGTH_SHORT).show();
                    //open user profile
-                        //start dhe UserProfileActivity
-                        startActivity(new Intent(LoginActivity.this, UserProfileActivity.class));
+                        //start the NotesActivity
+                        startActivity(new Intent(LoginActivity.this, NotesActivity.class));
                         finish();
                     }else{
                         firebaseUser.sendEmailVerification();
@@ -169,7 +169,7 @@ private static final String TAG = "LoginActivity";
         super.onStart();
         if(authProfile.getCurrentUser()!= null){
             Toast.makeText(LoginActivity.this, "Already logged in!",Toast.LENGTH_SHORT).show();
-            //start the userProfileActivity
+            //start the NotesActivity
             startActivity(new Intent(LoginActivity.this, NotesActivity.class));
             finish(); //close LoginActivity
         }else{

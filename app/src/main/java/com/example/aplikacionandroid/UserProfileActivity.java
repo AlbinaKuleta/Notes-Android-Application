@@ -174,6 +174,10 @@ progressBar.setVisibility(View.GONE);
         }else if (id == R.id.menu_notifications) {
             Intent intent = new Intent(UserProfileActivity.this, NotificationsActivity.class);
             startActivity(intent);
+        }else if(id == R.id.menu_notes){
+            Intent intent = new Intent(UserProfileActivity.this, NotesActivity.class);
+            startActivity(intent);
+            finish();
         }else if(id == R.id.menu_update_profile){
             Intent intent = new Intent(UserProfileActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
