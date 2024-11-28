@@ -18,6 +18,9 @@
     <item android:title="My Notes"
         android:id="@+id/menu_notes"/>
 
+    <item android:title="My Profile"
+        android:id="@+id/menu_profile"/>
+
     <item android:title="Update Profile"
         android:id="@+id/menu_update_profile"/>
 

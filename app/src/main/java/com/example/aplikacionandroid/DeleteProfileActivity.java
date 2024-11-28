@@ -1,7 +1,9 @@
 package com.example.aplikacionandroid;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -215,10 +217,48 @@ private static final String TAG = "DeleteProfileActivity";
         });
     }
 
+    private void updateBadge(TextView badge) {
+        SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
+        int unreadCount = prefs.getInt("unread_count", 0); // Retrieve unread count
+
+        if (unreadCount > 0) {
+            badge.setText(String.valueOf(unreadCount));
+            badge.setVisibility(View.VISIBLE);
+        } else {
+            badge.setVisibility(View.GONE);
+        }
+    }
+    //Creating ActionBar Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.second_menu, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.menu_notifications);
+        View actionView = menuItem.getActionView();
+
+        if (actionView == null) {
+            actionView = getLayoutInflater().inflate(R.layout.badge_icon, null);
+            menuItem.setActionView(actionView);
+        }
+
+        TextView badge = actionView.findViewById(R.id.notification_badge);
+        updateBadge(badge); // Update the badge with the current unread count
+
+        actionView.setOnClickListener(v -> {
+            // Open the NotificationsActivity
+            startActivity(new Intent(DeleteProfileActivity.this, NotificationsActivity.class));
+
+            // Clear the badge count after clicking
+            clearBadgeCount();
+            badge.setVisibility(View.GONE); // Hide the badge from the UI
+        });
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void clearBadgeCount() {
+        SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
+        prefs.edit().putInt("unread_count", 0).apply();
     }
     //When any menu item is selected
     @Override
@@ -233,9 +273,12 @@ private static final String TAG = "DeleteProfileActivity";
         }else if (id == R.id.menu_notifications) {
             Intent intent = new Intent(DeleteProfileActivity.this, NotificationsActivity.class);
             startActivity(intent);
-        }
-        else if(id == R.id.menu_notes){
+        }else if(id == R.id.menu_notes){
             Intent intent = new Intent(DeleteProfileActivity.this, NotesActivity.class);
+            startActivity(intent);
+            finish();
+        }else if(id == R.id.menu_profile){
+            Intent intent = new Intent(DeleteProfileActivity.this, UserProfileActivity.class);
             startActivity(intent);
             finish();
         }else if(id == R.id.menu_update_profile){
@@ -249,7 +292,6 @@ private static final String TAG = "DeleteProfileActivity";
         }else if(id == R.id.menu_delete_profile){
             Intent intent = new Intent(DeleteProfileActivity.this, DeleteProfileActivity.class);
             startActivity(intent);
-            finish();
         }else if(id == R.id.menu_logout){
             authProfile.signOut();
             Toast.makeText(DeleteProfileActivity.this, "Logged Out", Toast.LENGTH_LONG).show();
