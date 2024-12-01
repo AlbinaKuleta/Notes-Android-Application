@@ -1,6 +1,7 @@
 # Ignore sensitive files
 app/src/main/assets/config.properties
 
+
 # Common ignored files for Android projects
 .gradle/
 .idea/
