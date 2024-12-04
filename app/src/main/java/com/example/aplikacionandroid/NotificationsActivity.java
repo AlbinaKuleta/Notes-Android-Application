@@ -22,6 +22,8 @@ public class NotificationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notifications);
 
+        getSupportActionBar().setTitle("One Note Application");
+
         recyclerView = findViewById(R.id.recycler_notifications);
         noNotifications = findViewById(R.id.no_notifications);
 

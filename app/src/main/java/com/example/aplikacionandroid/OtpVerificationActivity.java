@@ -15,6 +15,7 @@ public class OtpVerificationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setTitle("Verify OTP");
         setContentView(R.layout.activity_otp_verification);
         editTextOtp = findViewById(R.id.editText_otp);
         buttonVerifyOtp = findViewById(R.id.button_verify_otp);
