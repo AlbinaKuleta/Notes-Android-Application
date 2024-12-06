@@ -1,14 +1,24 @@
 package com.example.aplikacionandroid;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * MainActivity.java
+ * <p>
+ * This class serves as the entry point for the One Note Application.
+ * It provides navigation to the Login and Registration screens.
+ */
+public class MainActivity extends AppCompatActivity {
+    /**
+     * Initializes the activity, sets the title, and defines button click actions for navigation.
+     *
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,18 +27,18 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("One Note Application");
         //Login activity
         Button buttonLogin = findViewById(R.id.button_login);
-        buttonLogin.setOnClickListener(new View.OnClickListener(){
-        @Override
-        public void onClick(View v){
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(intent);
-        }
-        });
-//Register Activity
-        Button buttonRegister = findViewById(R.id.button_register);
-        buttonRegister.setOnClickListener(new View.OnClickListener(){
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button buttonRegister = findViewById(R.id.button_register);
+        buttonRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }

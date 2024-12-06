@@ -1,17 +1,11 @@
 package com.example.aplikacionandroid;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -20,9 +14,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -30,12 +24,30 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Random;
 
+/**
+ * LoginActivity.java
+ * <p>
+ * This class provides the login functionality for the Android application, enabling users to:
+ * - Enter their email and password for authentication.
+ * - Reset their password if forgotten.
+ * - Display or hide the password in the input field.
+ * - Authenticate credentials via Firebase.
+ * - Validate email verification before granting access.
+ * - Send OTP for additional security during login.
+ * - Provide user feedback through UI elements and Toast messages.
+ */
+
 public class LoginActivity extends AppCompatActivity {
     private EditText editTextLoginEmail, editTextLoginPwd;
     private ProgressBar progressBar;
     private FirebaseAuth authProfile;
     private static final String TAG = "LoginActivity";
 
+    /**
+     * Initializes the activity, sets up UI components, and defines button actions.
+     *
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,25 +85,31 @@ public class LoginActivity extends AppCompatActivity {
             String textEmail = editTextLoginEmail.getText().toString();
             String textPwd = editTextLoginPwd.getText().toString();
 
-            if(TextUtils.isEmpty(textEmail)){
+            if (TextUtils.isEmpty(textEmail)) {
                 Toast.makeText(LoginActivity.this, "Please enter your email", Toast.LENGTH_SHORT).show();
                 editTextLoginEmail.setError("Email is required");
                 editTextLoginEmail.requestFocus();
-            }else if(!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()){
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(textEmail).matches()) {
                 Toast.makeText(LoginActivity.this, "Please re-enter your email", Toast.LENGTH_SHORT).show();
                 editTextLoginEmail.setError("Valid email is required");
                 editTextLoginEmail.requestFocus();
-            }else if(TextUtils.isEmpty(textPwd)){
+            } else if (TextUtils.isEmpty(textPwd)) {
                 Toast.makeText(LoginActivity.this, "Please enter your password", Toast.LENGTH_SHORT).show();
                 editTextLoginPwd.setError("Password is required");
                 editTextLoginPwd.requestFocus();
-            }else{
+            } else {
                 progressBar.setVisibility(View.VISIBLE);
                 loginUser(textEmail, textPwd);
             }
         });
     }
 
+    /**
+     * Authenticates the user using Firebase and manages post-login actions.
+     *
+     * @param email User's email address.
+     * @param pwd   User's password.
+     */
     private void loginUser(String email, String pwd) {
         authProfile.signInWithEmailAndPassword(email, pwd).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
@@ -151,7 +169,6 @@ public class LoginActivity extends AppCompatActivity {
 
         new JavaMailAPI(LoginActivity.this, email, subject, message).execute();
     }
-
 
 
     @Override

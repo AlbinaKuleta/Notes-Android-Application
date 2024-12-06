@@ -16,14 +16,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,19 +32,30 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+/**
+ * Activity for allowing a user to delete their profile and associated data.
+ * It includes user re-authentication, confirmation dialogs, and integration
+ * with Firebase Authentication and Realtime Database for profile and data deletion.
+ */
+
 public class DeleteProfileActivity extends AppCompatActivity {
-private FirebaseAuth authProfile;
-private FirebaseUser firebaseUser;
-private EditText editTextUserPwd;
-private TextView textViewAuthenticated;
-private ProgressBar progressBar;
-private String userPwd;
-private Button buttonReAuthenticate, buttonDeleteUser;
-private static final String TAG = "DeleteProfileActivity";
+    private FirebaseAuth authProfile;
+    private FirebaseUser firebaseUser;
+    private EditText editTextUserPwd;
+    private TextView textViewAuthenticated;
+    private ProgressBar progressBar;
+    private String userPwd;
+    private Button buttonReAuthenticate, buttonDeleteUser;
+    private static final String TAG = "DeleteProfileActivity";
 
-
+    /**
+     * Initializes the activity, sets up UI components, and verifies user authentication.
+     *
+     * @param savedInstanceState Contains the activity's previously saved state, if any.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delete_profile);
 
@@ -66,30 +73,34 @@ private static final String TAG = "DeleteProfileActivity";
         authProfile = FirebaseAuth.getInstance();
         firebaseUser = authProfile.getCurrentUser();
 
-        if(firebaseUser.equals("")){
+        if (firebaseUser.equals("")) {
             Toast.makeText(DeleteProfileActivity.this, "Something went wrong!" +
                     "User Details aren't available at the moment.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(DeleteProfileActivity.this, UserProfileActivity.class);
             startActivity(intent);
             finish();
-        }else{
+        } else {
             reAuthenticateUser(firebaseUser);
         }
 
     }
 
-    //reAuthenticate user before changing password
+    /**
+     * Re-authenticates the user before performing sensitive operations like deletion.
+     *
+     * @param firebaseUser The current logged-in user.
+     */
     private void reAuthenticateUser(FirebaseUser firebaseUser) {
         buttonReAuthenticate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 userPwd = editTextUserPwd.getText().toString();
 
-                if(TextUtils.isEmpty(userPwd)){
+                if (TextUtils.isEmpty(userPwd)) {
                     Toast.makeText(DeleteProfileActivity.this, "Password is needed", Toast.LENGTH_SHORT).show();
                     editTextUserPwd.setError("Please enter your current password to authenticate");
                     editTextUserPwd.requestFocus();
-                }else{
+                } else {
                     progressBar.setVisibility(View.VISIBLE);
 
                     //ReAuthenticate User now
@@ -98,7 +109,7 @@ private static final String TAG = "DeleteProfileActivity";
                     firebaseUser.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 progressBar.setVisibility(View.GONE);
 
                                 //disable edit text for password
@@ -112,7 +123,7 @@ private static final String TAG = "DeleteProfileActivity";
                                 textViewAuthenticated.setText("You are authenticated." +
                                         "You can delete your profile and related data now!");
                                 Toast.makeText(DeleteProfileActivity.this, "Password has been verified." +
-                                        "You can delete your profile now. Be careful this action is irreversible",
+                                                "You can delete your profile now. Be careful this action is irreversible",
                                         Toast.LENGTH_SHORT).show();
 
                                 //update the color of change password button
@@ -125,8 +136,8 @@ private static final String TAG = "DeleteProfileActivity";
                                         showAlertDialog();
                                     }
                                 });
-                            }else{
-                                try{
+                            } else {
+                                try {
                                     throw task.getException();
                                 } catch (Exception e) {
                                     Toast.makeText(DeleteProfileActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -141,6 +152,9 @@ private static final String TAG = "DeleteProfileActivity";
         });
     }
 
+    /**
+     * Displays a confirmation dialog for user profile and data deletion.
+     */
     private void showAlertDialog() {
         //setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(DeleteProfileActivity.this);
@@ -151,16 +165,16 @@ private static final String TAG = "DeleteProfileActivity";
         builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              deleteUser(firebaseUser);
+                deleteUser(firebaseUser);
             }
         });
 //return back to user profile activity if user presses cancel button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(DeleteProfileActivity.this, UserProfileActivity.class);
-                    startActivity(intent);
-                    finish();
+                Intent intent = new Intent(DeleteProfileActivity.this, UserProfileActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
         //Alert dialog
@@ -176,20 +190,25 @@ private static final String TAG = "DeleteProfileActivity";
         alertDialog.show();
     }
 
+    /**
+     * Deletes the user from Firebase Authentication and removes their associated data.
+     *
+     * @param firebaseUser The current logged-in user to be deleted.
+     */
     private void deleteUser(FirebaseUser firebaseUser) {
         firebaseUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     deleteUserData();
                     authProfile.signOut();
                     Toast.makeText(DeleteProfileActivity.this, "User has been deleted!",
                             Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(DeleteProfileActivity.this, MainActivity.class);
-               startActivity(intent);
-               finish();
-                }else{
-                    try{
+                    startActivity(intent);
+                    finish();
+                } else {
+                    try {
                         throw task.getException();
                     } catch (Exception e) {
                         Toast.makeText(DeleteProfileActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -200,7 +219,9 @@ private static final String TAG = "DeleteProfileActivity";
         });
     }
 
-   //delete all the data of user
+    /**
+     * Deletes user data from Firebase Realtime Database.
+     */
     private void deleteUserData() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Registered User");
         databaseReference.child(firebaseUser.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -217,6 +238,11 @@ private static final String TAG = "DeleteProfileActivity";
         });
     }
 
+    /**
+     * Updates the notification badge based on unread notifications.
+     *
+     * @param badge The badge TextView to update.
+     */
     private void updateBadge(TextView badge) {
         SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
         int unreadCount = prefs.getInt("unread_count", 0); // Retrieve unread count
@@ -228,6 +254,7 @@ private static final String TAG = "DeleteProfileActivity";
             badge.setVisibility(View.GONE);
         }
     }
+
     //Creating ActionBar Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -256,43 +283,47 @@ private static final String TAG = "DeleteProfileActivity";
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * Clears the notification badge count.
+     */
     private void clearBadgeCount() {
         SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
         prefs.edit().putInt("unread_count", 0).apply();
     }
+
     //When any menu item is selected
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.menu_refresh){
+        if (id == R.id.menu_refresh) {
             //refresh activity
             startActivity(getIntent());
             finish();
-            overridePendingTransition(0,0);
-        }else if (id == R.id.menu_notifications) {
+            overridePendingTransition(0, 0);
+        } else if (id == R.id.menu_notifications) {
             Intent intent = new Intent(DeleteProfileActivity.this, NotificationsActivity.class);
             startActivity(intent);
-        }else if(id == R.id.menu_notes){
+        } else if (id == R.id.menu_notes) {
             Intent intent = new Intent(DeleteProfileActivity.this, NotesActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_profile){
+        } else if (id == R.id.menu_profile) {
             Intent intent = new Intent(DeleteProfileActivity.this, UserProfileActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_update_profile){
+        } else if (id == R.id.menu_update_profile) {
             Intent intent = new Intent(DeleteProfileActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_update_email){
+        } else if (id == R.id.menu_update_email) {
             Intent intent = new Intent(DeleteProfileActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_delete_profile){
+        } else if (id == R.id.menu_delete_profile) {
             Intent intent = new Intent(DeleteProfileActivity.this, DeleteProfileActivity.class);
             startActivity(intent);
-        }else if(id == R.id.menu_logout){
+        } else if (id == R.id.menu_logout) {
             authProfile.signOut();
             Toast.makeText(DeleteProfileActivity.this, "Logged Out", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(DeleteProfileActivity.this, MainActivity.class);
@@ -302,7 +333,7 @@ private static final String TAG = "DeleteProfileActivity";
                     Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish(); //close user profile activity
-        }else{
+        } else {
             Toast.makeText(DeleteProfileActivity.this, "Something went wrong!", Toast.LENGTH_LONG).show();
 
         }

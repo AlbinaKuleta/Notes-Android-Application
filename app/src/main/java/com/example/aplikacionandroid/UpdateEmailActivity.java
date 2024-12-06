@@ -15,13 +15,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -40,6 +36,10 @@ public class UpdateEmailActivity extends AppCompatActivity {
     private Button buttonUpdateEmail;
     private EditText editTextNewEmail, editTextPwd;
 
+    /**
+     * Called when the activity is first created.
+     * Initializes UI components, Firebase authentication, and sets up the current user's old email.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,13 +64,19 @@ public class UpdateEmailActivity extends AppCompatActivity {
         TextView textViewOldEmail = findViewById(R.id.textView_update_email_old);
         textViewOldEmail.setText(userOldEmail);
 
-        if (firebaseUser == null){
+        if (firebaseUser == null) {
             Toast.makeText(UpdateEmailActivity.this, "Something went wrong!User's details not available.", Toast.LENGTH_LONG).show();
-        }else{
+        } else {
             reAuthenticate(firebaseUser);
         }
     }
 
+    /**
+     * Re-authenticates the user by verifying their password.
+     * Once verified, enables the fields to update the email.
+     *
+     * @param firebaseUser The currently logged-in user.
+     */
     private void reAuthenticate(FirebaseUser firebaseUser) {
         Button buttonVerifyUser = findViewById(R.id.button_authenticate_user);
         buttonVerifyUser.setOnClickListener(new View.OnClickListener() {
@@ -79,17 +85,17 @@ public class UpdateEmailActivity extends AppCompatActivity {
                 //obtain password for authentication
                 userPwd = editTextPwd.getText().toString();
 
-                if(TextUtils.isEmpty(userPwd)){
+                if (TextUtils.isEmpty(userPwd)) {
                     Toast.makeText(UpdateEmailActivity.this, "Password is needed to continue", Toast.LENGTH_SHORT).show();
                     editTextPwd.setError("Please enter your password for authentication");
                     editTextPwd.requestFocus();
-                }else{
+                } else {
                     progressBar.setVisibility(View.VISIBLE);
                     AuthCredential credential = EmailAuthProvider.getCredential(userOldEmail, userPwd);
                     firebaseUser.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 progressBar.setVisibility(View.GONE);
 
                                 Toast.makeText(UpdateEmailActivity.this, "Password has been verified." +
@@ -112,28 +118,28 @@ public class UpdateEmailActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(View v) {
                                         userNewEmail = editTextNewEmail.getText().toString();
-                                        if(TextUtils.isEmpty(userNewEmail)){
+                                        if (TextUtils.isEmpty(userNewEmail)) {
                                             Toast.makeText(UpdateEmailActivity.this, "New email is required", Toast.LENGTH_SHORT).show();
                                             editTextNewEmail.setError("Please enter new email");
                                             editTextNewEmail.requestFocus();
-                                        }else if (!Patterns.EMAIL_ADDRESS.matcher(userNewEmail).matches()){
+                                        } else if (!Patterns.EMAIL_ADDRESS.matcher(userNewEmail).matches()) {
                                             Toast.makeText(UpdateEmailActivity.this, "Please enter valid email", Toast.LENGTH_SHORT).show();
                                             editTextNewEmail.setError("Please provide valid email");
                                             editTextNewEmail.requestFocus();
-                                        }else if(userOldEmail.matches(userNewEmail)){
+                                        } else if (userOldEmail.matches(userNewEmail)) {
                                             Toast.makeText(UpdateEmailActivity.this, "New email cannot be same as old email", Toast.LENGTH_SHORT).show();
                                             editTextNewEmail.setError("Please re-enter new email");
                                             editTextNewEmail.requestFocus();
-                                        }else{
+                                        } else {
                                             progressBar.setVisibility(View.VISIBLE);
                                             updateEmail(firebaseUser);
                                         }
                                     }
                                 });
-                            }else{
-                                try{
+                            } else {
+                                try {
                                     throw task.getException();
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     Toast.makeText(UpdateEmailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
 
@@ -145,29 +151,39 @@ public class UpdateEmailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Updates the user's email in Firebase.
+     *
+     * @param firebaseUser The currently logged-in user.
+     */
     private void updateEmail(FirebaseUser firebaseUser) {
-    firebaseUser.verifyBeforeUpdateEmail(userNewEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
-        @Override
-        public void onComplete(@NonNull Task<Void> task) {
-            if(task.isSuccessful()){
-                //verify email
-                firebaseUser.sendEmailVerification();
-                Toast.makeText(UpdateEmailActivity.this, "Email has been updated. Please verify your new email.", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(UpdateEmailActivity.this, UserProfileActivity.class);
-                startActivity(intent);
-                finish();
-            }else{
-                try{
-                    throw task.getException();
-                }catch (Exception e){
-                    Toast.makeText(UpdateEmailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        firebaseUser.verifyBeforeUpdateEmail(userNewEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    //verify email
+                    firebaseUser.sendEmailVerification();
+                    Toast.makeText(UpdateEmailActivity.this, "Email has been updated. Please verify your new email.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(UpdateEmailActivity.this, UserProfileActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    try {
+                        throw task.getException();
+                    } catch (Exception e) {
+                        Toast.makeText(UpdateEmailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
+                progressBar.setVisibility(View.GONE);
             }
-            progressBar.setVisibility(View.GONE);
-        }
-    });
+        });
     }
 
+    /**
+     * Updates the notification badge with the unread count.
+     *
+     * @param badge The TextView representing the badge.
+     */
     private void updateBadge(TextView badge) {
         SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
         int unreadCount = prefs.getInt("unread_count", 0); // Retrieve unread count
@@ -179,7 +195,10 @@ public class UpdateEmailActivity extends AppCompatActivity {
             badge.setVisibility(View.GONE);
         }
     }
-    //Creating ActionBar Menu
+
+    /**
+     * Creates the action bar menu with a notification badge.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.second_menu, menu);
@@ -207,43 +226,49 @@ public class UpdateEmailActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * Clears the notification badge count.
+     */
     private void clearBadgeCount() {
         SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
         prefs.edit().putInt("unread_count", 0).apply();
     }
-    //When any menu item is selected
+
+    /**
+     * Handles action bar menu item selection.
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.menu_refresh){
+        if (id == R.id.menu_refresh) {
             //refresh activity
             startActivity(getIntent());
             finish();
-            overridePendingTransition(0,0);
-        }else if (id == R.id.menu_notifications) {
+            overridePendingTransition(0, 0);
+        } else if (id == R.id.menu_notifications) {
             Intent intent = new Intent(UpdateEmailActivity.this, NotificationsActivity.class);
             startActivity(intent);
-        }else if(id == R.id.menu_notes){
+        } else if (id == R.id.menu_notes) {
             Intent intent = new Intent(UpdateEmailActivity.this, NotesActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_profile){
+        } else if (id == R.id.menu_profile) {
             Intent intent = new Intent(UpdateEmailActivity.this, UserProfileActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_update_profile){
+        } else if (id == R.id.menu_update_profile) {
             Intent intent = new Intent(UpdateEmailActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_update_email){
+        } else if (id == R.id.menu_update_email) {
             Intent intent = new Intent(UpdateEmailActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_delete_profile){
+        } else if (id == R.id.menu_delete_profile) {
             Intent intent = new Intent(UpdateEmailActivity.this, DeleteProfileActivity.class);
             startActivity(intent);
-        }else if(id == R.id.menu_logout){
+        } else if (id == R.id.menu_logout) {
             authProfile.signOut();
             Toast.makeText(UpdateEmailActivity.this, "Logged Out", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(UpdateEmailActivity.this, MainActivity.class);
@@ -253,7 +278,7 @@ public class UpdateEmailActivity extends AppCompatActivity {
                     Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish(); //close user profile activity
-        }else{
+        } else {
             Toast.makeText(UpdateEmailActivity.this, "Something went wrong!", Toast.LENGTH_LONG).show();
 
         }

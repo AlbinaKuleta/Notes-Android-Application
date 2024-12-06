@@ -1,18 +1,10 @@
 package com.example.aplikacionandroid;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,9 +17,17 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.aplikacionandroid.utils.NotificationUtils;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,9 +35,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,13 +42,28 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * NotesActivity
+ * <p>
+ * This class represents the main activity for managing notes in the Android application.
+ * It handles the display, creation, updating, and deletion of notes, as well as user authentication,
+ * notification management, and interaction with Firebase Realtime Database.
+ */
+
 public class NotesActivity extends AppCompatActivity {
     private static final int POST_NOTIFICATION_PERMISSION_REQUEST_CODE = 1;
     private FirebaseAuth authProfile;
     private FirebaseDatabase database;
     private String userId;
 
-
+    /**
+     * onCreate
+     * <p>
+     * Initializes the activity, checks user authentication, sets up the RecyclerView for notes,
+     * and creates a notification channel. Handles the addition and display of notes.
+     *
+     * @param savedInstanceState Contains the data most recently supplied in `onSaveInstanceState()`.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +126,11 @@ public class NotesActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * openAddNoteDialog
+     * <p>
+     * Opens a dialog for the user to input a new note's title and content.
+     */
     private void openAddNoteDialog() {
         View view = LayoutInflater.from(this).inflate(R.layout.add_note_dialog, null);
         TextInputLayout titleLayout = view.findViewById(R.id.titleLayout);
@@ -144,6 +161,13 @@ public class NotesActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    /**
+     * requestNotificationPermissionAndShow
+     * <p>
+     * Requests POST_NOTIFICATIONS permission and displays a notification for the created note.
+     *
+     * @param noteTitle The title of the note for which the notification is displayed.
+     */
     private void requestNotificationPermissionAndShow(String noteTitle) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -157,6 +181,13 @@ public class NotesActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * showNotification
+     * <p>
+     * Displays a notification with details of the created note.
+     *
+     * @param noteTitle The title of the note to include in the notification.
+     */
     private void showNotification(String noteTitle) {
         String channelId = "note_creation_channel";
 
@@ -182,7 +213,12 @@ public class NotesActivity extends AppCompatActivity {
         notificationManager.notify(1, builder.build());
     }
 
-
+    /**
+     * createNotificationChannel
+     * <p>
+     * Creates a notification channel for displaying notifications about note creation events.
+     * Required for Android 8.0 (API level 26) and higher.
+     */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = "note_creation_channel";
@@ -197,6 +233,14 @@ public class NotesActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+    /**
+     * openEditNoteDialog
+     * <p>
+     * Opens a dialog for editing an existing note or deleting it.
+     *
+     * @param note The `Note` object to edit or delete.
+     */
     private void openEditNoteDialog(Note note) {
         View view = LayoutInflater.from(this).inflate(R.layout.add_note_dialog, null);
         TextInputLayout titleLayout = view.findViewById(R.id.titleLayout);
@@ -229,6 +273,13 @@ public class NotesActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    /**
+     * storeNoteInDatabase
+     * <p>
+     * Stores a new note in the Firebase Realtime Database under the current user's notes.
+     *
+     * @param note The `Note` object to store.
+     */
     private void storeNoteInDatabase(Note note) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage("Storing note...");
@@ -253,17 +304,31 @@ public class NotesActivity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to add note!", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    /**
+     * incrementBadgeCount
+     * <p>
+     * Increments the unread notification badge count stored in SharedPreferences.
+     */
     private void incrementBadgeCount() {
         SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
         int unreadCount = prefs.getInt("unread_count", 0);
         prefs.edit().putInt("unread_count", unreadCount + 1).apply(); // Increment unread count
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         invalidateOptionsMenu();
     }
 
+    /**
+     * updateBadge
+     * <p>
+     * Updates the badge UI element with the current unread notification count.
+     *
+     * @param badge The TextView displaying the badge count.
+     */
     private void updateBadge(TextView badge) {
         SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
         int unreadCount = prefs.getInt("unread_count", 0); // Retrieve unread count
@@ -276,7 +341,14 @@ public class NotesActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * updateNoteInDatabase
+     * <p>
+     * Updates an existing note in the Firebase Realtime Database.
+     *
+     * @param key  The unique key of the note to update.
+     * @param note The updated `Note` object.
+     */
     private void updateNoteInDatabase(String key, Note note) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage("Updating note...");
@@ -298,7 +370,13 @@ public class NotesActivity extends AppCompatActivity {
                 });
     }
 
-
+    /**
+     * deleteNoteFromDatabase
+     * <p>
+     * Deletes an existing note from the Firebase Realtime Database.
+     *
+     * @param key The unique key of the note to delete.
+     */
     private void deleteNoteFromDatabase(String key) {
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage("Deleting note...");
@@ -316,7 +394,14 @@ public class NotesActivity extends AppCompatActivity {
                 });
     }
 
-    //Creating ActionBar Menu
+    /**
+     * onCreateOptionsMenu
+     * <p>
+     * Inflates the options menu and sets up the notification badge.
+     *
+     * @param menu The options menu in which items are placed.
+     * @return true to display the menu.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.common_menu, menu);
@@ -344,42 +429,52 @@ public class NotesActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * clearBadgeCount
+     * <p>
+     * Clears the unread notification badge count stored in SharedPreferences.
+     */
     private void clearBadgeCount() {
-        // Ruaj numrin e lexuar në SharedPreferences si 0
         SharedPreferences prefs = getSharedPreferences("notifications_pref", Context.MODE_PRIVATE);
         prefs.edit().putInt("unread_count", 0).apply();
     }
 
-    //When any menu item is selected
+    /**
+     * onOptionsItemSelected
+     * <p>
+     * Handles menu item selection, including navigation to various activities.
+     *
+     * @param item The selected menu item.
+     * @return true if the item is handled successfully.
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.menu_refresh){
+        if (id == R.id.menu_refresh) {
             //refresh activity
             startActivity(getIntent());
             finish();
-            overridePendingTransition(0,0);
-        }else if (id == R.id.menu_notifications) {
+            overridePendingTransition(0, 0);
+        } else if (id == R.id.menu_notifications) {
             Intent intent = new Intent(NotesActivity.this, NotificationsActivity.class);
             startActivity(intent);
-        }
-        else if(id == R.id.menu_profile){
+        } else if (id == R.id.menu_profile) {
             Intent intent = new Intent(NotesActivity.this, UserProfileActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_update_profile){
+        } else if (id == R.id.menu_update_profile) {
             Intent intent = new Intent(NotesActivity.this, UpdateProfileActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_update_email){
+        } else if (id == R.id.menu_update_email) {
             Intent intent = new Intent(NotesActivity.this, UpdateEmailActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_delete_profile){
+        } else if (id == R.id.menu_delete_profile) {
             Intent intent = new Intent(NotesActivity.this, DeleteProfileActivity.class);
             startActivity(intent);
             finish();
-        }else if(id == R.id.menu_logout){
+        } else if (id == R.id.menu_logout) {
             authProfile.signOut();
             Toast.makeText(NotesActivity.this, "Logged Out", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(NotesActivity.this, MainActivity.class);
@@ -389,7 +484,7 @@ public class NotesActivity extends AppCompatActivity {
                     Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish(); //close user profile activity
-        }else{
+        } else {
             Toast.makeText(NotesActivity.this, "Something went wrong!", Toast.LENGTH_LONG).show();
 
         }

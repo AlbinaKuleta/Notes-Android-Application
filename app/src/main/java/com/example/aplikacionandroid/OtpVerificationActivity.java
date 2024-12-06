@@ -1,4 +1,5 @@
 package com.example.aplikacionandroid;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,11 +8,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+/**
+ * This activity handles the OTP verification process for user authentication.
+ */
 public class OtpVerificationActivity extends AppCompatActivity {
     private EditText editTextOtp;
     private Button buttonVerifyOtp;
     private ProgressBar progressBar;
+
+    /**
+     * Called when the activity is first created.
+     * Initializes UI elements and sets up the OTP verification logic.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the data it most recently supplied. Otherwise, null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

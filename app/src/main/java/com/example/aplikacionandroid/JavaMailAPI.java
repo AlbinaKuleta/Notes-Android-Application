@@ -1,4 +1,5 @@
 package com.example.aplikacionandroid;
+
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -14,12 +15,24 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+/**
+ * JavaMailAPI is an asynchronous task for sending emails in Android applications.
+ * It uses the JavaMail API to handle email transmission securely over SMTP.
+ */
 public class JavaMailAPI extends AsyncTask<Void, Void, Void> {
     private final String email;
     private final String subject;
     private final String message;
     private final Context context;
 
+    /**
+     * Constructor to initialize the email details and context.
+     *
+     * @param context The application context.
+     * @param email   The recipient's email address.
+     * @param subject The subject of the email.
+     * @param message The content of the email.
+     */
     public JavaMailAPI(Context context, String email, String subject, String message) {
         this.context = context;
         this.email = email;
@@ -27,6 +40,13 @@ public class JavaMailAPI extends AsyncTask<Void, Void, Void> {
         this.message = message;
     }
 
+    /**
+     * Handles the email sending operation in the background.
+     * Configures SMTP properties, authenticates using credentials, and sends the email.
+     *
+     * @param params Optional parameters (not used).
+     * @return null Always returns null.
+     */
     @Override
     protected Void doInBackground(Void... params) {
         Properties props = new Properties();
